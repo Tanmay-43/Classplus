@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AttendEase | Login</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="login-body">
+<div class="login-wrap">
+  <aside class="login-art">
+    <div class="brand light"><span class="logo">A</span> AttendEase</div>
+    <h2>Smarter attendance for every classroom.</h2>
+    <p>Mark attendance, track trends and spot at-risk students early, all in one place.</p>
+    <div class="art-card"><b>94%</b><span>Average attendance this week</span><div class="bar"><i style="width:94%"></i></div></div>
+    <small>Department of Computer Science &middot; Mini Project</small>
+  </aside>
+  <main class="login-form">
+    <div class="brand"><span class="logo">A</span> AttendEase</div>
+    <p class="muted">Student Attendance Management System</p>
+    <h1>Welcome back</h1>
+    {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+    <form method="post" action="{{ url_for('login') }}">
+      <label>Username or email<input name="username" type="text" placeholder="admin" required autofocus></label>
+      <label>Password<input name="password" type="password" placeholder="Enter password" required></label>
+      <div class="row-between">
+        <label class="check"><input type="checkbox" name="remember"> Remember me</label>
+        <a href="#" onclick="alert('Please contact the college administrator to reset your password.');return false;">Forgot password?</a>
+      </div>
+      <button class="btn primary block" type="submit">Log in</button>
+    </form>
+    <p class="hint">Demo credentials: <b>admin</b> / <b>admin123</b></p>
+  </main>
+</div>
+</body>
+</html>

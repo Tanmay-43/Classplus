@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AttendEase | Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <symbol id="i-dashboard" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></symbol>
+  <symbol id="i-students" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8"/></symbol>
+  <symbol id="i-attendance" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></symbol>
+  <symbol id="i-reports" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></symbol>
+  <symbol id="i-classes" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></symbol>
+</svg>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="logo">A</span> AttendEase</div>
+    <nav>
+      <a href="#" data-page="dashboard" class="active"><svg><use href="#i-dashboard"/></svg>Dashboard</a>
+      <a href="#" data-page="students"><svg><use href="#i-students"/></svg>Students</a>
+      <a href="#" data-page="attendance"><svg><use href="#i-attendance"/></svg>Attendance</a>
+      <a href="#" data-page="reports"><svg><use href="#i-reports"/></svg>Reports</a>
+      <a href="#" data-page="classes"><svg><use href="#i-classes"/></svg>Classes &amp; Subjects</a>
+      <a href="#" data-page="settings"><svg><use href="#i-settings"/></svg>Settings</a>
+    </nav>
+    <a class="logout" href="{{ url_for('logout') }}"><svg><use href="#i-logout"/></svg>Logout</a>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">&#9776;</button>
+      <h1 id="pageTitle">Dashboard</h1>
+      <input class="search" id="globalSearch" type="search" placeholder="Search students...">
+      <button class="icon-btn" id="bellBtn" aria-label="Notifications"><svg><use href="#i-bell"/></svg><span class="dot" id="bellDot"></span></button>
+      <div class="profile"><span class="avatar sm">AD</span><div><b>Admin</b><small>{{ user }}</small></div></div>
+    </header>
+
+    <main class="content">
+      <section class="page" id="page-dashboard">
+        <div class="stats" id="dashStats"></div>
+        <div class="grid-2">
+          <div class="card"><h3>Attendance overview</h3><div id="donut" class="donut-wrap"></div></div>
+          <div class="card"><h3>Weekly attendance trend</h3><div id="weekTrend"></div></div>
+        </div>
+        <div class="card"><h3>Today's attendance</h3><div class="table-wrap"><table><thead><tr><th>Student</th><th>Roll No</th><th>Class</th><th>Subject</th><th>Status</th><th>Attendance %</th></tr></thead><tbody id="todayBody"></tbody></table></div></div>
+        <div class="grid-2">
+          <div class="card"><h3>Recent activity</h3><ul class="activity" id="activity"></ul></div>
+          <div class="card"><h3>Low attendance students</h3><ul class="activity" id="lowList"></ul></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-students" hidden>
+        <div class="toolbar">
+          <input id="stuSearch" type="search" placeholder="Search by name, roll or email">
+          <select id="stuClass"></select>
+          <button class="btn primary" id="addStudentBtn">+ Add Student</button>
+        </div>
+        <div class="card"><div class="table-wrap"><table><thead><tr><th>Student</th><th>Roll No</th><th>Class</th><th>Department</th><th>Email</th><th>Attendance %</th><th>Status</th><th>Actions</th></tr></thead><tbody id="stuBody"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-profile" hidden>
+        <button class="btn" id="backBtn">&larr; Back to students</button>
+        <div id="profileBox"></div>
+      </section>
+
+      <section class="page" id="page-attendance" hidden>
+        <div class="toolbar">
+          <select id="attClass"></select><select id="attSubject"></select><input type="date" id="attDate">
+          <button class="btn" id="markAllBtn">Mark All Present</button>
+          <button class="btn primary" id="saveAttBtn">Save Attendance</button>
+        </div>
+        <div class="card"><div class="table-wrap"><table><thead><tr><th>Roll No</th><th>Student Name</th><th>Present</th><th>Absent</th><th>Late</th><th>Attendance %</th></tr></thead><tbody id="attBody"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-reports" hidden>
+        <div class="toolbar"><span class="muted">Attendance summary across all classes</span><button class="btn primary" id="exportBtn">Export Report (CSV)</button></div>
+        <div class="stats" id="repStats"></div>
+        <div class="grid-3">
+          <div class="card"><h3>Attendance by subject</h3><div id="subjChart"></div></div>
+          <div class="card"><h3>Present vs absent</h3><div id="pvaChart" class="donut-wrap"></div></div>
+          <div class="card"><h3>Monthly trend</h3><div id="monthTrend"></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card"><h3>Class-wise attendance</h3><div class="table-wrap"><table><thead><tr><th>Class</th><th>Students</th><th>Average</th><th>Status</th></tr></thead><tbody id="classRep"></tbody></table></div></div>
+          <div class="card"><h3>Subject-wise attendance</h3><div class="table-wrap"><table><thead><tr><th>Subject</th><th>Records</th><th>Attendance</th></tr></thead><tbody id="subjRep"></tbody></table></div></div>
+        </div>
+        <div class="card"><h3>Student-wise attendance</h3><div class="table-wrap"><table><thead><tr><th>Student</th><th>Class</th><th>Attended</th><th>Total</th><th>%</th><th>Status</th></tr></thead><tbody id="stuRep"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-classes" hidden>
+        <div class="card"><div class="card-head"><h3>Classes</h3><button class="btn primary sm" data-add="class">+ Add Class</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Class</th><th>Department</th><th>Students</th><th>Faculty</th><th>Actions</th></tr></thead><tbody id="classBody"></tbody></table></div></div>
+        <div class="card"><div class="card-head"><h3>Subjects</h3><button class="btn primary sm" data-add="subject">+ Add Subject</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Subject</th><th>Class</th><th>Students</th><th>Faculty</th><th>Actions</th></tr></thead><tbody id="subjBody"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-settings" hidden>
+        <div class="grid-2">
+          <div class="card"><h3>Admin profile</h3>
+            <label>Full name<input id="setName" value="Administrator"></label>
+            <label>Email<input id="setEmail" value="admin@college.edu"></label>
+            <button class="btn primary" id="saveProfile">Save Profile</button></div>
+          <div class="card"><h3>Change password</h3>
+            <label>Current password<input type="password" id="pwOld"></label>
+            <label>New password<input type="password" id="pwNew"></label>
+            <label>Confirm password<input type="password" id="pwConf"></label>
+            <button class="btn primary" id="savePw">Update Password</button></div>
+          <div class="card"><h3>Attendance threshold</h3>
+            <label>Minimum required attendance (%)<input type="number" id="setThr" value="75" min="1" max="100"></label>
+            <button class="btn primary" id="saveThr">Save Threshold</button></div>
+          <div class="card"><h3>Notification preferences</h3>
+            <label class="check"><input type="checkbox" checked> Email me when attendance is low</label>
+            <label class="check"><input type="checkbox" checked> Daily attendance summary</label>
+            <label class="check"><input type="checkbox"> Weekly report</label>
+            <button class="btn primary" id="saveNotif">Save Preferences</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg" hidden>
+  <div class="modal"><div class="card-head"><h3 id="modalTitle"></h3><button class="icon-btn" id="modalClose">&times;</button></div>
+    <form id="modalForm"><div id="modalFields"></div><div class="modal-actions"><button type="button" class="btn" id="modalCancel">Cancel</button><button class="btn primary" type="submit">Save</button></div></form></div>
+</div>
+<div class="toasts" id="toasts"></div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
