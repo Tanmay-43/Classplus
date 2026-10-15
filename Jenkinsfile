@@ -1,9 +1,11 @@
+```groovy
 pipeline {
     agent any
 
     environment {
         IMAGE = 'attendance-app'
         CONTAINER = 'attendance-app'
+        DOCKER = 'C:\\Users\\DELL\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe'
     }
 
     stages {
@@ -47,14 +49,14 @@ print("All tests passed")
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t %IMAGE%:%BUILD_NUMBER% -t %IMAGE%:latest .'
+                bat '"%DOCKER%" build -t %IMAGE%:%BUILD_NUMBER% -t %IMAGE%:latest .'
             }
         }
 
         stage('Deploy Container') {
             steps {
-                bat 'docker rm -f %CONTAINER% 2>nul || exit /b 0'
-                bat 'docker run -d --name %CONTAINER% -p 5000:5000 %IMAGE%:latest'
+                bat '"%DOCKER%" rm -f %CONTAINER% 2>nul || exit /b 0'
+                bat '"%DOCKER%" run -d --name %CONTAINER% -p 5000:5000 %IMAGE%:latest'
             }
         }
     }
@@ -68,3 +70,4 @@ print("All tests passed")
         }
     }
 }
+```
