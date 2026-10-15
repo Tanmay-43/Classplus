@@ -22,7 +22,26 @@ pipeline {
 
         stage('Test Application') {
             steps {
-                bat 'venv\\Scripts\\python.exe -c "from app import app; c=app.test_client(); assert c.get(''/login'').status_code == 200; assert c.get(''/health'').status_code == 200; assert c.get(''/dashboard'').status_code == 302; r=c.post(''/login'', data={''username'':''admin'',''password'':''admin123''}); assert r.status_code == 302; assert c.get(''/dashboard'').status_code == 200; assert len(c.get(''/api/data'').json[''students'']) >= 10; print(''All tests passed'')"'
+                writeFile file: 'test_app.py', text: '''
+from app import app
+
+client = app.test_client()
+
+assert client.get("/login").status_code == 200
+assert client.get("/health").status_code == 200
+assert client.get("/dashboard").status_code == 302
+
+response = client.post(
+    "/login",
+    data={"username": "admin", "password": "admin123"}
+)
+assert response.status_code == 302
+assert client.get("/dashboard").status_code == 200
+assert len(client.get("/api/data").json["students"]) >= 10
+
+print("All tests passed")
+'''
+                bat 'venv\\Scripts\\python.exe test_app.py'
             }
         }
 
@@ -44,7 +63,6 @@ pipeline {
         success {
             echo 'AttendEase deployed at http://localhost:5000'
         }
-
         failure {
             echo 'Pipeline failed. Check the stage logs.'
         }
